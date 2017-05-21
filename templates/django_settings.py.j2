@@ -1,0 +1,60 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+"""
+Setting overrides specific to selected environment.
+This file is populated automatically by Ansible deployment script.
+"""
+
+from settings_base import *
+
+
+ALLOWED_HOSTS = [
+{% if django_domain_name %}
+    '{{ django_domain_name }}',
+{% else %}
+    '*',
+{% endif %}
+]
+
+
+# SECURITY WARNING: don’t let this public key leak.
+# Apart from the person who manages your production application
+# no one should ever see this key.
+# Rotate this key on regular basis.
+SECRET_KEY = '{{ django_secret_key }}'
+
+ADMINS = [
+    {% for admin in django_admins %}
+    ('{{ admin.name }}', '{{ admin.email }}'),
+    {% endfor %}
+]
+
+
+{% if django_debug %}
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
+
+INSTALLED_APPS += [
+    'django_extensions',
+    'sslserver',
+]
+{% endif %}
+
+{% if django_ssl %}
+SECURE_SSL_REDIRECT = True
+# This requires a corresponding setting in Nginx config
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
+
+{% endif %}
+
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': '{{ django_sqlite_db_path }}',
+    }
+}
+
+STATIC_ROOT = '{{ django_static_root }}'
+STATIC_URL = '{{ django_static_url }}'

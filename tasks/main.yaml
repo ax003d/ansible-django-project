@@ -1,0 +1,47 @@
+---
+
+- name: upload app code
+  when: push_mode == "sync"
+  synchronize:
+    src: "{{ django_local_repo_root }}"
+    dest: "{{ django_app_root|dirname }}"
+  notify:
+    - python code updated
+
+- name: mark code as changed
+  when: push_mode == "none"
+  command: /bin/true
+  notify:
+    - python code updated
+
+- name: install pip requirements
+  pip: requirements={{ django_pip_dependencies }}
+  become: true
+  notify:
+    - python code updated
+
+- name: upload django settings
+  template:
+    src=templates/django_settings.py.j2
+    dest={{ django_app_root }}/{{ django_project_module }}/settings.py
+  notify:
+    - python code updated
+
+- name: deployment checklist
+  django_manage:
+    app_path={{ django_app_root }}
+    command="check --deploy"
+
+- name: set in place db schema
+  django_manage:
+    app_path={{ django_app_root }}
+    command={{ item }}
+  with_items:
+    - migrate
+    - collectstatic
+
+- name: load initial data
+  when: django_initial_data_fixture.load|bool
+  django_manage:
+    app_path={{ django_app_root }}
+    command="loaddata {{ django_initial_data_fixture.path }}"

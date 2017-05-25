@@ -49,14 +49,14 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
 {% endif %}
 
 
-{% if django_sqlite_db_path %}
+{% if django_sqlite_db_path is defined %}
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': '{{ django_sqlite_db_path }}',
     }
 }
-{% elif django_pgsql_db %}
+{% elif django_pgsql_db is defined%}
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',

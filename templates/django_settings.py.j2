@@ -56,14 +56,14 @@ DATABASES = {
         'NAME': '{{ django_sqlite_db_path }}',
     }
 }
-{% elif django_pgsql_db is defined%}
+{% elif django_db is defined %}
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': '{{ django_pgsql_db.name }}',
-        'USER': '{{ django_pgsql_db.user }}',
-        'PASSWORD': '{{ django_pgsql_db.password }}',
-        'HOST': '{{ django_pgsql_db.host }}',
+        'ENGINE': '{{ django_db.backend }}',
+        'NAME': '{{ django_db.name }}',
+        'USER': '{{ django_db.user }}',
+        'PASSWORD': '{{ django_db.password }}',
+        'HOST': '{{ django_db.host }}',
     }
 }
 {% else %}

@@ -49,12 +49,26 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
 {% endif %}
 
 
+{% if django_sqlite_db_path %}
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': '{{ django_sqlite_db_path }}',
     }
 }
+{% elif django_pgsql_db %}
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': '{{ django_pgsql_db.name }}',
+        'USER': '{{ django_pgsql_db.user }}',
+        'PASSWORD': '{{ django_pgsql_db.password }}',
+        'HOST': '{{ django_pgsql_db.host }}',
+    }
+}
+{% else %}
+raise Exception("Missing database configuration")
+{% endif %}
 
 STATIC_ROOT = '{{ django_static_root }}'
 STATIC_URL = '{{ django_static_url }}'

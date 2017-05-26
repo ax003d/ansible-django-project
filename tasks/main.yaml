@@ -27,10 +27,17 @@
   notify:
     - python code updated
 
+- name: custom django settings
+  lineinfile:
+    path: "{{ repo_root }}/{{ module_name }}/settings.py"
+    line: "{{ key }} = {{ python_construct }}"
+  with_items: "{{ django_settings_extra }}"
+
 - name: deployment checklist
   django_manage:
     app_path={{ django_app_root }}
     command="check --deploy"
+  ignore_errors: yes
 
 - name: set in place db schema
   django_manage:

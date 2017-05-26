@@ -8,6 +8,11 @@
   pip: name=pip state=latest
   become: true
 
+- name: ensure app code directory exists
+  file:
+    path: "{{ django_app_root }}"
+    state: directory
+
 - name: upload app code
   when: django_push_mode == "sync"
   synchronize:

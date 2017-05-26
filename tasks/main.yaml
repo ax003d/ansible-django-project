@@ -1,5 +1,11 @@
 ---
 
+- name: ensure pip is installed
+  apt: name=python-pip state=installed
+
+- name: ensure latest pip is installed
+  pip: name=pip state=latest
+
 - name: upload app code
   when: push_mode == "sync"
   synchronize:

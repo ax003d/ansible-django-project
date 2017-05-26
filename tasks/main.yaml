@@ -29,8 +29,8 @@
 
 - name: custom django settings
   lineinfile:
-    path: "{{ repo_root }}/{{ module_name }}/settings.py"
-    line: "{{ key }} = {{ python_construct }}"
+    path: "{{ django_app_root }}/{{ django_project_module }}/settings.py"
+    line: "{{ item.key }} = {{ item.python_construct }}"
   with_items: "{{ django_settings_extra }}"
 
 - name: deployment checklist

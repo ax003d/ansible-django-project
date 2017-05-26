@@ -9,7 +9,7 @@
   become: true
 
 - name: upload app code
-  when: push_mode == "sync"
+  when: django_push_mode == "sync"
   synchronize:
     src: "{{ django_local_repo_root }}"
     dest: "{{ django_app_root|dirname }}"
@@ -17,7 +17,7 @@
     - python code updated
 
 - name: mark code as changed
-  when: push_mode == "none"
+  when: django_push_mode == "none"
   command: /bin/true
   notify:
     - python code updated

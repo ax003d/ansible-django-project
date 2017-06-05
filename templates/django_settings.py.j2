@@ -72,3 +72,22 @@ raise Exception("Missing database configuration")
 
 STATIC_ROOT = '{{ django_static_root }}'
 STATIC_URL = '{{ django_static_url }}'
+
+{% if django_log_file %}
+LOGGING = {
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.RotatingFileHandler',
+            'filename': '{{ django_log_file }}',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file', 'console', 'mail_admins'],
+            'level': 'INFO',
+        },
+    },
+}
+{% endif %}

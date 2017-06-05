@@ -6,6 +6,7 @@ Setting overrides specific to selected environment.
 This file is populated automatically by Ansible deployment script.
 """
 
+import logging
 from settings_base import *
 
 
@@ -74,21 +75,11 @@ STATIC_ROOT = '{{ django_static_root }}'
 STATIC_URL = '{{ django_static_url }}'
 
 {% if django_log_file %}
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '{{ django_log_file }}',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file', 'console', 'mail_admins'],
-            'level': 'INFO',
-        },
-    },
-}
+django_logger = logging.getLogger('django')
+file_handler = logging.handlers.TimedRotatingFileHandler(
+    '{{ django_log_file }}',
+    when='W0',
+    utc=True)
+file_handler.setLevel(logging.{{ django_log_level|upper }})
+django_logger.addHandler(file_handler)
 {% endif %}

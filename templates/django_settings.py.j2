@@ -75,6 +75,7 @@ STATIC_URL = '{{ django_static_url }}'
 
 {% if django_log_file %}
 LOGGING = {
+    'version': 1,
     'disable_existing_loggers': False,
     'handlers': {
         'file': {

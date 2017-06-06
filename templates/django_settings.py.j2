@@ -82,6 +82,12 @@ STATIC_ROOT = '{{ django_static_root }}'
 STATIC_URL = '{{ django_static_url }}'
 
 {% if django_log_file %}
+LOGGING_CONFIG = None
+
+import logging.config
+from django.utils import log
+logging.config.dictConfig(log.DEFAULT_LOGGING)
+
 django_logger = logging.getLogger('django')
 file_handler = logging.handlers.TimedRotatingFileHandler(
     '{{ django_log_file }}',

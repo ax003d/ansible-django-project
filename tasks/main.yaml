@@ -27,20 +27,29 @@
   notify:
     - python code updated
 
-- name: install app-specific pip requirements
+- name: install pip requirements
   pip: requirements={{ django_pip_dependencies }}
   become: true
   notify:
     - python code updated
 
-- name: install debug extensions
-  pip: name={{ item }} state=latest
-  become: true
+- name: install pip requirements • django debug
   when: django_debug|bool
+  pip: name={{ item }} state=latest
   with_items:
     - django-sslserver
     - Werkzeug
     - django-extensions
+  become: true
+  notify:
+    - python code updated
+
+- name: install pip requirements • django cors
+  when: django_cors is defined
+  pip: name=django-cors-headers state=latest
+  become: true
+  notify:
+    - python code updated
 
 - name: upload django settings
   template:

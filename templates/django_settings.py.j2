@@ -26,6 +26,7 @@ ALLOWED_HOSTS = [
 # Rotate this key on regular basis.
 SECRET_KEY = '{{ django_secret_key }}'
 
+
 ADMINS = [
     {% for admin in django_admins %}
     ('{{ admin.name }}', '{{ admin.email }}'),
@@ -38,6 +39,8 @@ MANAGERS = [
     {% endfor %}
 ]
 
+
+# Email
 
 {% if django_email is defined %}
 
@@ -66,6 +69,8 @@ EMAIL_USE_TLS = True
 {% endif %}
 
 
+# Debug
+
 {% if django_debug is defined %}
 {% if django_debug %}
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -78,6 +83,9 @@ INSTALLED_APPS += [
 {% endif %}
 {% endif %}
 
+
+# SSL
+
 {% if django_ssl is defined %}
 {% if django_ssl %}
 SECURE_SSL_REDIRECT = True
@@ -86,6 +94,8 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
 {% endif %}
 {% endif %}
 
+
+# Database
 
 {% if django_sqlite_db_path is defined %}
 DATABASES = {
@@ -108,8 +118,14 @@ DATABASES = {
 raise Exception("Missing database configuration")
 {% endif %}
 
+
+# Static
+
 STATIC_ROOT = '{{ django_static_root }}'
 STATIC_URL = '{{ django_static_url }}'
+
+
+# Logging
 
 {% if django_log_file is defined %}
 {% if django_log_file %}
@@ -127,4 +143,47 @@ file_handler = logging.handlers.TimedRotatingFileHandler(
 file_handler.setLevel(logging.{{ django_log_level|upper }})
 django_logger.addHandler(file_handler)
 {% endif %}
+{% endif %}
+
+
+# Session cookie
+
+{% if django_session_cookie.name is defined %}
+SESSION_COOKIE_NAME = '{{ django_session_cookie.name }}'
+{% endif %}
+
+{% if django_session_cookie.domain is defined %}
+SESSION_COOKIE_DOMAIN = '{{ django_session_cookie.domain }}'
+{% endif %}
+
+
+# CORS
+
+{% if django_cors is defined %}
+
+INSTALLED_APPS += [
+    'corsheaders',
+]
+
+{% if django_cors.allow_credentials is defined %}
+{% if django_cors.allow_credentials %}
+CORS_ALLOW_CREDENTIALS = True
+{% endif %}
+{% endif %}
+
+{% if django_cors.origin_whitelist is defined %}
+CORS_ORIGIN_WHITELIST = [
+    {% for item in django_cors.origin_whitelist %}
+    '{{ item }}',
+    {% endfor %}
+]
+{% endif %}
+
+{% if django_cors.expose_headers is defined %}
+CORS_EXPOSE_HEADERS = [
+    {% for item in django_cors.expose_headers %}
+    '{{ item }}',
+    {% endfor %}
+]
+
 {% endif %}

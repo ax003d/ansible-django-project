@@ -39,6 +39,34 @@ MANAGERS = [
 ]
 
 
+{% if django_email is defined %}
+
+{% if django_email.host is defined %}
+EMAIL_HOST = '{{ django_email.host }}'
+{% endif %}
+
+{% if django_email.port is defined %}
+EMAIL_PORT = {{ django_email.port }}
+{% endif %}
+
+{% if django_email.user is defined %}
+EMAIL_HOST_USER = '{{ django_email.user }}'
+{% endif %}
+
+{% if django_email.password is defined %}
+EMAIL_HOST_PASSWORD = '{{ django_email.password }}'
+{% endif %}
+
+{% if django_email.use_tls is defined %}
+{% if django_email.use_tls %}
+EMAIL_USE_TLS = True
+{% endif %}
+{% endif %}
+
+{% endif %}
+
+
+{% if django_debug is defined %}
 {% if django_debug %}
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -48,12 +76,14 @@ INSTALLED_APPS += [
     'sslserver',
 ]
 {% endif %}
+{% endif %}
 
+{% if django_ssl is defined %}
 {% if django_ssl %}
 SECURE_SSL_REDIRECT = True
 # This requires a corresponding setting in Nginx config
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
-
+{% endif %}
 {% endif %}
 
 
@@ -81,6 +111,7 @@ raise Exception("Missing database configuration")
 STATIC_ROOT = '{{ django_static_root }}'
 STATIC_URL = '{{ django_static_url }}'
 
+{% if django_log_file is defined %}
 {% if django_log_file %}
 LOGGING_CONFIG = None
 
@@ -95,4 +126,5 @@ file_handler = logging.handlers.TimedRotatingFileHandler(
     utc=True)
 file_handler.setLevel(logging.{{ django_log_level|upper }})
 django_logger.addHandler(file_handler)
+{% endif %}
 {% endif %}

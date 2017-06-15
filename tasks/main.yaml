@@ -27,11 +27,20 @@
   notify:
     - python code updated
 
-- name: install pip requirements
+- name: install app-specific pip requirements
   pip: requirements={{ django_pip_dependencies }}
   become: true
   notify:
     - python code updated
+
+- name: install debug extensions
+  pip: name={{ item }} state=latest
+  become: true
+  when: django_debug|bool
+  with_items:
+    - django-sslserver
+    - Werkzeug
+    - django-extensions
 
 - name: upload django settings
   template:

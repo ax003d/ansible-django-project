@@ -88,9 +88,19 @@ INSTALLED_APPS += [
 
 {% if django_ssl is defined %}
 {% if django_ssl %}
+# Only work over HTTPS, redirect from plain HTTP
 SECURE_SSL_REDIRECT = True
-# This requires a corresponding setting in Nginx config
+
+# Make sure Django knows when the request is made over SSL
+# IMPORTANT: relies on a corresponding setting in frontend webserver config
+# Not having frontend configured for this exact header will make you vulnerable
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
+
+# POST requests with CSRF protection only work over HTTPS
+CSRF_COOKIE_SECURE = True
+
+# Sessions only work over HTTPS
+SESSION_COOKIE_SECURE = True
 {% endif %}
 {% endif %}
 

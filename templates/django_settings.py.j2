@@ -33,11 +33,13 @@ ADMINS = [
     {% endfor %}
 ]
 
+{% if django_managers is defined %}
 MANAGERS = [
     {% for manager in django_managers %}
     ('{{ manager.name }}', '{{ manager.email }}'),
     {% endfor %}
 ]
+{% endif %}
 
 
 # Email
@@ -158,12 +160,14 @@ django_logger.addHandler(file_handler)
 
 # Session cookie
 
+{% if django_session_cookie is defined %}
 {% if django_session_cookie.name is defined %}
 SESSION_COOKIE_NAME = '{{ django_session_cookie.name }}'
 {% endif %}
 
 {% if django_session_cookie.domain is defined %}
 SESSION_COOKIE_DOMAIN = '{{ django_session_cookie.domain }}'
+{% endif %}
 {% endif %}
 
 

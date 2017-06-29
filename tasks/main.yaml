@@ -35,7 +35,7 @@
 
 - name: install pip requirements • django debug
   when: django_debug|bool
-  pip: name={{ item }} state=latest
+  pip: name={{ item }} state=present
   with_items:
     - django-sslserver
     - Werkzeug
@@ -46,7 +46,7 @@
 
 - name: install pip requirements • django cors
   when: django_cors is defined
-  pip: name=django-cors-headers state=latest
+  pip: name=django-cors-headers state=present
   become: true
   notify:
     - python code updated

@@ -139,13 +139,30 @@ STATIC_URL = '{{ django_static_url }}'
 
 # Logging
 
-{% if django_log_file is defined %}
-{% if django_log_file %}
-LOGGING_CONFIG = None
-
 import logging.config
 from django.utils import log
-logging.config.dictConfig(log.DEFAULT_LOGGING)
+
+# Stop Django from overriding logging config with LOGGING setting
+LOGGING_CONFIG = None
+
+# Define our logging configuration basing it on Django’s default config
+config = log.DEFAULT_LOGGING.copy()
+
+# Ensure admin email tracebacks include detailed information
+# by requesting HTML debug output
+# NOTE: Email error reports in production may contain sensitive data
+try:
+    if config['handlers']['mail_admins']['class'].endswith('AdminEmailHandler'):
+        config['handlers']['mail_admins']['include_html'] = True
+except KeyError:
+    pass
+
+# Apply our logging configuration
+logging.config.dictConfig(config)
+
+{% if django_log_file is defined %}
+{% if django_log_file %}
+# Add file-based handler to Django’s catch-all logger
 
 django_logger = logging.getLogger('django')
 file_handler = logging.handlers.TimedRotatingFileHandler(

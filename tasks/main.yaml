@@ -1,14 +1,38 @@
 ---
 
-- name: Django app | Dependencies | Make sure Pip installed
+- name: Django app | Dependencies | Pip | Make sure itself is installed
   apt: name=python-pip state=installed
   become: true
 
-- name: Django app | Dependencies | Make sure Pip is latest
+- name: Django app | Dependencies | Pip | Make sure itself is latest
   pip: name=pip state=latest
   become: true
 
-- name: Django app | Source code | Make sure code root directory exists
+- name: Django app | Dependencies | Pip | Install | Custom requirements
+  pip: requirements={{ django_pip_dependencies }}
+  become: true
+  notify:
+    - python code updated
+
+- name: Django app | Dependencies | Pip | Install | Debug requirements
+  when: django_debug|bool
+  pip: name={{ item }} state=present
+  with_items:
+    - django-sslserver
+    - Werkzeug
+    - django-extensions
+  become: true
+  notify:
+    - python code updated
+
+- name: Django app | Dependencies | Pip | Install | CORS requirements
+  when: django_cors is defined
+  pip: name=django-cors-headers state=present
+  become: true
+  notify:
+    - python code updated
+
+- name: Django app | Source code | Make sure directory exists
   file:
     path: "{{ django_app_root }}"
     state: directory
@@ -27,30 +51,6 @@
   notify:
     - python code updated
 
-- name: Django app | Dependencies | Install Pip requirements | Custom
-  pip: requirements={{ django_pip_dependencies }}
-  become: true
-  notify:
-    - python code updated
-
-- name: Django app | Dependencies | Install Pip requirements | Debug
-  when: django_debug|bool
-  pip: name={{ item }} state=present
-  with_items:
-    - django-sslserver
-    - Werkzeug
-    - django-extensions
-  become: true
-  notify:
-    - python code updated
-
-- name: Django app | Dependencies | Install Pip requirements | CORS
-  when: django_cors is defined
-  pip: name=django-cors-headers state=present
-  become: true
-  notify:
-    - python code updated
-
 - name: Django app | Settings | Upload settings template
   template:
     src=templates/django_settings.py.j2
@@ -58,7 +58,7 @@
   notify:
     - python code updated
 
-- name: Django app | Settings | Push custom settings
+- name: Django app | Settings | Append extra settings
   lineinfile:
     path: "{{ django_app_root }}/{{ django_project_module }}/settings.py"
     line: "{{ item.key }} = {{ item.python_construct }}"

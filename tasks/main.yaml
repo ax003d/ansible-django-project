@@ -1,19 +1,19 @@
 ---
 
-- name: ensure pip is installed
+- name: Django app | Dependencies | Make sure Pip installed
   apt: name=python-pip state=installed
   become: true
 
-- name: ensure latest pip is installed
+- name: Django app | Dependencies | Make sure Pip is latest
   pip: name=pip state=latest
   become: true
 
-- name: ensure app code directory exists
+- name: Django app | Source code | Make sure code root directory exists
   file:
     path: "{{ django_app_root }}"
     state: directory
 
-- name: upload app code
+- name: Django app | Source code | Push code
   when: django_push_mode == "sync"
   synchronize:
     src: "{{ django_local_repo_root }}"
@@ -21,19 +21,19 @@
   notify:
     - python code updated
 
-- name: mark code as changed
+- name: Django app | Source code | Notify handlers about changed code
   when: django_push_mode == "none"
   command: /bin/true
   notify:
     - python code updated
 
-- name: install pip requirements
+- name: Django app | Dependencies | Install Pip requirements | Custom
   pip: requirements={{ django_pip_dependencies }}
   become: true
   notify:
     - python code updated
 
-- name: install pip requirements • django debug
+- name: Django app | Dependencies | Install Pip requirements | Debug
   when: django_debug|bool
   pip: name={{ item }} state=present
   with_items:
@@ -44,41 +44,43 @@
   notify:
     - python code updated
 
-- name: install pip requirements • django cors
+- name: Django app | Dependencies | Install Pip requirements | CORS
   when: django_cors is defined
   pip: name=django-cors-headers state=present
   become: true
   notify:
     - python code updated
 
-- name: upload django settings
+- name: Django app | Settings | Upload settings template
   template:
     src=templates/django_settings.py.j2
     dest={{ django_app_root }}/{{ django_project_module }}/settings.py
   notify:
     - python code updated
 
-- name: custom django settings
+- name: Django app | Settings | Push custom settings
   lineinfile:
     path: "{{ django_app_root }}/{{ django_project_module }}/settings.py"
     line: "{{ item.key }} = {{ item.python_construct }}"
   with_items: "{{ django_settings_extra }}"
 
-- name: deployment checklist
+- name: Django app | Deployment checklist
   django_manage:
     app_path={{ django_app_root }}
     command="check --deploy"
   ignore_errors: yes
 
-- name: set in place db schema
+- name: Django app | Migrate database
   django_manage:
     app_path={{ django_app_root }}
-    command={{ item }}
-  with_items:
-    - migrate
-    - collectstatic
+    command=migrate
 
-- name: load initial data
+- name: Django app | Collect static assets
+  django_manage:
+    app_path={{ django_app_root }}
+    command=collectstatic
+
+- name: Django app | Load initial data
   when: django_initial_data_fixture.load|bool
   django_manage:
     app_path={{ django_app_root }}

@@ -1,5 +1,18 @@
 ---
 
+- name: Django app | Source code | Make sure directory exists
+  file:
+    path: "{{ django_app_root }}"
+    state: directory
+
+- name: Django app | Source code | Push code
+  when: django_push_mode == "sync"
+  synchronize:
+    src: "{{ django_local_repo_root }}"
+    dest: "{{ django_app_root }}"
+  notify:
+    - python code updated
+
 - name: Django app | Dependencies | Pip | Make sure itself is installed
   apt: name=python-pip state=installed
   become: true
@@ -29,19 +42,6 @@
   when: django_cors is defined
   pip: name=django-cors-headers state=present
   become: true
-  notify:
-    - python code updated
-
-- name: Django app | Source code | Make sure directory exists
-  file:
-    path: "{{ django_app_root }}"
-    state: directory
-
-- name: Django app | Source code | Push code
-  when: django_push_mode == "sync"
-  synchronize:
-    src: "{{ django_local_repo_root }}"
-    dest: "{{ django_app_root }}"
   notify:
     - python code updated
 

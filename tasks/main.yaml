@@ -21,13 +21,13 @@
   pip: name=pip state=latest
   become: true
 
-- name: Django app | Dependencies | Pip | Install | Custom requirements
+- name: Django app | Dependencies | Custom Pip requirements
   pip: requirements={{ django_pip_dependencies }}
   become: true
   notify:
     - python code updated
 
-- name: Django app | Dependencies | Pip | Install | Debug requirements
+- name: Django app | Dependencies | Debug requirements
   when: django_debug|bool
   pip: name={{ item }} state=present
   with_items:
@@ -38,7 +38,7 @@
   notify:
     - python code updated
 
-- name: Django app | Dependencies | Pip | Install | CORS requirements
+- name: Django app | Dependencies | CORS requirements
   when: django_cors is defined
   pip: name=django-cors-headers state=present
   become: true

@@ -45,7 +45,16 @@
   notify:
     - python code updated
 
-- name: Django app | Dependencies | Pip | Install | Memcached requirements
+- name: Django app | Dependencies | Memcached | Install Apt libs
+  when: django_memcached_locations is defined
+  apt: name={{ item }} state=present
+  with_items:
+    - libsasl2-dev
+    - zlib1g-dev
+    - libmemcached-dev
+  become: true
+
+- name: Django app | Dependencies | Memcached | Install Pylibmc
   when: django_memcached_locations is defined
   pip: name=pylibmc state=present
   become: true

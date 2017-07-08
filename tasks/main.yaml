@@ -45,6 +45,13 @@
   notify:
     - python code updated
 
+- name: Django app | Dependencies | Pip | Install | Memcached requirements
+  when: django_memcached_locations is defined
+  pip: name=pylibmc state=present
+  become: true
+  notify:
+    - python code updated
+
 - name: Django app | Source code | Notify handlers about changed code
   when: django_push_mode == "none"
   command: /bin/true

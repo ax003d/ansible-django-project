@@ -135,6 +135,29 @@ raise Exception("Missing database configuration")
 {% endif %}
 
 
+# Cache
+
+{# TODO: Support more cache backends #}
+{% if django_memcached_locations is defined %}
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
+        'LOCATION': [
+            {% for location in django_memcached_locations %}
+            '{{ location.host }}:{{ location.port }}',
+            {% endfor %}
+        ]
+    }
+}
+{% else %}
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    }
+}
+{% endif %}
+
+
 # Static
 
 STATIC_ROOT = '{{ django_static_root }}'

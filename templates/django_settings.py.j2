@@ -188,16 +188,61 @@ except KeyError:
 logging.config.dictConfig(config)
 
 {% if django_log_file is defined %}
-{% if django_log_file %}
 # Add file-based handler to Django’s catch-all logger
 
 django_logger = logging.getLogger('django')
+
+{% if django_log_file.errors is defined %}
+
 file_handler = logging.handlers.TimedRotatingFileHandler(
-    '{{ django_log_file }}',
+    '{{ django_log_file.errors }}',
     when='W0',
     utc=True)
-file_handler.setLevel(logging.{{ django_log_level|upper }})
+file_handler.setFormatter(logging.Formatter(fmt=
+    '%(levelname)s %(asctime)s %(name)s %(message)s in %(funcName)s %(filename)s:%(lineno)d in %(process)d %(thread)d'
+))
+file_handler.setLevel(logging.ERROR)
+
 django_logger.addHandler(file_handler)
+
+{% endif %}
+{% if django_log_file.non_errors is defined %}
+
+class _MaxLevelFilter(Filter):
+    """Only allows messages with level less than chosen."""
+
+    def __init__(self, level):
+        self.level = level
+
+    def filter(self, record):
+        return record.levelno < self.level
+
+file_handler = logging.handlers.TimedRotatingFileHandler(
+    '{{ django_log_file.non_errors }}',
+    when='W0',
+    utc=True)
+file_handler.setFormatter(logging.Formatter(fmt=
+    '%(levelname)s %(asctime)s %(name)s %(message)s'
+))
+file_handler.setFilter(_MaxLevelFilter(logging.ERROR))
+file_handler.setLevel(logging.{{ django_log_file.min_level|upper }})
+
+django_logger.addHandler(file_handler)
+
+{% endif %}
+{% if django_log_file.all is defined %}
+
+file_handler = logging.handlers.TimedRotatingFileHandler(
+    '{{ django_log_file.all }}',
+    when='W0',
+    utc=True)
+file_handler.setFormatter(logging.Formatter(fmt=
+    '%(levelname)s %(asctime)s %(name)s %(filename)s:%(lineno)d %(process)d %(thread)d %(message)s'
+))
+file_handler.setLevel(logging.{{ django_log_file.min_level|upper }})
+
+django_logger.addHandler(file_handler)
+
 {% endif %}
 {% endif %}
 

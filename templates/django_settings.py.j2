@@ -208,7 +208,7 @@ django_logger.addHandler(file_handler)
 {% endif %}
 {% if django_log_file.non_errors is defined %}
 
-class _MaxLevelFilter(Filter):
+class _MaxLevelFilter(logging.Filter):
     """Only allows messages with level less than chosen."""
 
     def __init__(self, level):

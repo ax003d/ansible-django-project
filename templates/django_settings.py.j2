@@ -188,7 +188,7 @@ except KeyError:
 logging.config.dictConfig(config)
 
 {% if django_log_file is defined %}
-# Add file-based handler to Django’s catch-all logger
+# Add file-based handlers to Django’s catch-all logger
 
 django_logger = logging.getLogger('django')
 

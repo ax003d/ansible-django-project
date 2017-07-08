@@ -224,7 +224,7 @@ file_handler = logging.handlers.TimedRotatingFileHandler(
 file_handler.setFormatter(logging.Formatter(fmt=
     '%(levelname)s %(asctime)s %(name)s %(message)s'
 ))
-file_handler.setFilter(_MaxLevelFilter(logging.ERROR))
+file_handler.addFilter(_MaxLevelFilter(logging.ERROR))
 file_handler.setLevel(logging.{{ django_log_file.min_level|upper }})
 
 django_logger.addHandler(file_handler)

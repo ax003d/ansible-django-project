@@ -142,12 +142,23 @@ raise Exception("Missing database configuration")
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
+        'OPTIONS': {
+            'binary': True,
+            'behaviors': {
+                'tcp_nodelay': True,
+                'tcp_keepalive': True,
+                'connect_timeout': 2000,
+                'send_timeout': 750 * 1000,
+                'receive_timeout': 750 * 1000,
+                '_poll_timeout': 2000,
+            },
+        },
         'LOCATION': [
             {% for location in django_memcached_locations %}
             '{{ location.host }}:{{ location.port }}',
             {% endfor %}
-        ]
-    }
+        ],
+    },
 }
 {% else %}
 CACHES = {

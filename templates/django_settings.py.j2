@@ -302,3 +302,14 @@ CORS_EXPOSE_HEADERS = [
 {% endif %}
 
 {% endif %}
+
+
+# Feature switches
+
+FEATURES = [
+{% if django_features is defined %}
+    {% for feature in django_features %}
+    'feature',
+    {% endfor %}
+{% endif %}
+]

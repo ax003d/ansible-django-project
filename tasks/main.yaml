@@ -12,6 +12,15 @@
     dest: "{{ django_app_root }}"
   notify:
     - python code updated
+  become: true
+
+- name: Django app | Source code | Push code| Make pushed code owned by user
+  when: django_push_mode == "sync"
+  command: "chown -R {{ user }}:{{ group }} {{ django_app_root }}"
+  notify:
+    - python code updated
+  become: true
+  become_user: root
 
 - name: Django app | Dependencies | Pip | Make sure itself is installed
   apt: name=python-pip state=installed

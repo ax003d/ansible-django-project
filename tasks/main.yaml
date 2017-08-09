@@ -84,10 +84,9 @@
     - python code updated
 
 - name: Django app | Settings | Append extra settings
-  lineinfile:
+  blockinfile:
     path: "{{ django_app_root }}/{{ django_project_module }}/settings.py"
-    line: "{{ item.key }} = {{ item.python_construct }}"
-  with_items: "{{ django_settings_extra }}"
+    block: "{{ django_settings_extra }}"
 
 - name: Django app | Deployment checklist
   django_manage:

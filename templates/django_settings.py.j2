@@ -12,8 +12,10 @@ from settings_base import *
 
 
 ALLOWED_HOSTS = [
-{% if django_domain_name %}
-    '{{ django_domain_name }}',
+{% if django_whitelisted_hosts %}
+    {% for host in django_whitelisted_hosts %}
+        '{{ host }}',
+    {% endfor %}
 {% else %}
     '*',
 {% endif %}

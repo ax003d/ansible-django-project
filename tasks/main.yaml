@@ -39,6 +39,7 @@
   tags: [django-dependencies]
   pip: requirements={{ django_pip_dependencies }}
   become: true
+  become_user: root
   notify:
     - python code updated
 

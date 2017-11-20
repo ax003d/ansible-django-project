@@ -29,11 +29,13 @@
   tags: [django-dependencies, django-initial]
   apt: name=python-pip state=installed
   become: true
+  become_user: root
 
 - name: Django app | Dependencies | Pip | Make sure itself is latest
   tags: [django-dependencies, django-initial]
   pip: name=pip state=latest
   become: true
+  become_user: root
 
 - name: Django app | Dependencies | Custom Pip requirements
   tags: [django-dependencies]

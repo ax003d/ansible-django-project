@@ -54,6 +54,7 @@
     - Werkzeug
     - django-extensions
   become: true
+  become_user: root
   notify:
     - python code updated
 

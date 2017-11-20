@@ -63,6 +63,7 @@
   when: django_cors is defined
   pip: name=django-cors-headers state=present
   become: true
+  become_user: root
   notify:
     - python code updated
 
@@ -75,12 +76,14 @@
     - zlib1g-dev
     - libmemcached-dev
   become: true
+  become_user: root
 
 - name: Django app | Dependencies | Memcached | Install Pylibmc
   tags: [django-dependencies, django-initial]
   when: django_memcached_locations is defined
   pip: name=pylibmc state=present
   become: true
+  become_user: root
   notify:
     - python code updated
 

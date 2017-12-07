@@ -3,7 +3,7 @@
 - name: Django app | Source code | Make sure directory exists
   tags: [django-app-code, django-initial]
   file:
-    path: "{{ django_app_root }}"
+    path: "{{ django_root }}"
     state: directory
 
 - name: Django app | Source code | Push code
@@ -11,7 +11,7 @@
   when: django_push_mode == "sync"
   synchronize:
     src: "{{ django_local_repo_root }}"
-    dest: "{{ django_app_root }}"
+    dest: "{{ django_root }}"
   notify:
     - python code updated
   become: true

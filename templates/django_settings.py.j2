@@ -30,18 +30,20 @@ SECRET_KEY = '{{ django_secret_key }}'
 
 
 ADMINS = [
+{% if django_admins is defined %}
     {% for admin in django_admins %}
     ('{{ admin.name }}', '{{ admin.email }}'),
     {% endfor %}
+{% endif %}
 ]
 
-{% if django_managers is defined %}
 MANAGERS = [
+{% if django_managers is defined %}
     {% for manager in django_managers %}
     ('{{ manager.name }}', '{{ manager.email }}'),
     {% endfor %}
-]
 {% endif %}
+]
 
 
 # Email

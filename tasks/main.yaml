@@ -63,6 +63,7 @@
   when: django_cors is defined
   pip: name=django-cors-headers state=present
   become: true
+  become_user: root
   notify:
     - python code updated
 

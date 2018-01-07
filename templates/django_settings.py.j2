@@ -282,6 +282,7 @@ SESSION_COOKIE_DOMAIN = '{{ django_session_cookie.domain }}'
 INSTALLED_APPS += [
     'corsheaders',
 ]
+MIDDLEWARE = ['corsheaders.middleware.CorsMiddleware'] + MIDDLEWARE
 
 {% if django_cors.allow_credentials is defined %}
 {% if django_cors.allow_credentials %}

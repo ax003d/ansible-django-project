@@ -27,19 +27,19 @@
 
 - name: Django app | Dependencies | Pip | Make sure itself is installed
   tags: [django-dependencies, django-initial]
-  apt: name=python-pip state=installed
+  apt: name=python3-pip state=installed
   become: true
   become_user: root
 
 - name: Django app | Dependencies | Pip | Make sure itself is latest
   tags: [django-dependencies, django-initial]
-  pip: name=pip state=latest
+  pip: executable=pip3 name=pip state=latest
   become: true
   become_user: root
 
 - name: Django app | Dependencies | Custom Pip requirements
   tags: [django-dependencies]
-  pip: requirements={{ django_pip_dependencies }}
+  pip: executable=pip3 requirements={{ django_pip_dependencies }}
   become: true
   become_user: root
   notify:
@@ -48,7 +48,7 @@
 - name: Django app | Dependencies | Debug requirements
   tags: [django-dependencies, django-initial]
   when: django_debug|bool
-  pip: name={{ item }} state=present
+  pip: executable=pip3 name={{ item }} state=present
   with_items:
     - django-sslserver
     - Werkzeug
@@ -61,7 +61,7 @@
 - name: Django app | Dependencies | CORS requirements
   tags: [django-dependencies]
   when: django_cors is defined
-  pip: name=django-cors-headers state=present
+  pip: executable=pip3 name=django-cors-headers state=present
   become: true
   become_user: root
   notify:
@@ -80,7 +80,7 @@
 - name: Django app | Dependencies | Memcached | Install Pylibmc
   tags: [django-dependencies, django-initial]
   when: django_memcached_locations is defined
-  pip: name=pylibmc state=present
+  pip: executable=pip3 name=pylibmc state=present
   become: true
   notify:
     - python code updated

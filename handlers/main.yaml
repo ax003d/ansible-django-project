@@ -1,0 +1,9 @@
+---
+
+- name: restart gunicorn
+  listen: "python code updated"
+  service:
+    name: webapp
+    use: service
+    state: reloaded
+  become: true

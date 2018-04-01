@@ -122,7 +122,7 @@
   tags: [django-static]
   django_manage:
     app_path={{ django_app_root }}
-    command=collectstatic
+    command=collectstatic {{ django_static_collection_args|default('') }}
 
 - name: Django app | Load initial data
   tags: [django-loaddata]

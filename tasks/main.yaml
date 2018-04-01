@@ -37,6 +37,14 @@
   become: true
   become_user: root
 
+- name: Django app | Dependencies | Install latest Gunicorn for Python 3
+  tags: [django-dependencies]
+  pip: executable=pip3 name=gunicorn state=latest
+  become: true
+  become_user: root
+  notify:
+    - python code updated
+
 - name: Django app | Dependencies | Custom Pip requirements
   tags: [django-dependencies]
   pip: executable=pip3 requirements={{ django_pip_dependencies }}
@@ -130,3 +138,15 @@
   django_manage:
     app_path={{ django_app_root }}
     command="loaddata {{ django_initial_data_fixture.path }}"
+
+- name: Django app | Define webapp service
+  tags: [django-wsgi]
+  template: src=templates/webapp.service.j2 dest=/etc/systemd/system/webapp.service
+  become: true
+  become_user: root
+
+- name: Django app | Enable webapp service
+  tags: [django-wsgi]
+  service: name=webapp enabled=yes
+  become: true
+  become_user: root

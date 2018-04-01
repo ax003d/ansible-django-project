@@ -1,0 +1,16 @@
+[Unit]
+Description=Gunicorn instance to serve the webapp
+After=network.target
+
+[Service]
+User={{ wsgi_run_as.user }}
+Group={{ wsgi_run_as.group }}
+PIDFile={{ wsgi_working_dir }}/gunicorn.pid
+Environment="PYTHONPATH={{ wsgi_pythonpath }}"
+WorkingDirectory={{ wsgi_working_dir }}
+ExecStart=/usr/local/bin/gunicorn --workers {{ wsgi_worker_count }} -b {{ wsgi_binding }} {{ wsgi_app_module }}
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+
+[Install]
+WantedBy=multi-user.target

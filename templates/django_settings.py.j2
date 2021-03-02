@@ -161,12 +161,20 @@ CACHES = {
             {% endfor %}
         ],
     },
+    'fs': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': '/var/tmp',
+    }
 }
 {% else %}
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-    }
+    },
+    'fs': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': '/var/tmp',
+    }    
 }
 {% endif %}
 

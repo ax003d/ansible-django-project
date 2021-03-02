@@ -163,7 +163,7 @@ CACHES = {
     },
     'fs': {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': '/var/tmp',
+        'LOCATION': '{{ django_file_cache_path }}'
     }
 }
 {% else %}
@@ -173,7 +173,7 @@ CACHES = {
     },
     'fs': {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': '/var/tmp',
+        'LOCATION': '{{ django_file_cache_path }}'
     }    
 }
 {% endif %}

@@ -1,5 +1,37 @@
 ---
 
+- name: install python3-venv
+  apt:
+    name: python3-venv
+    state: present
+    update_cache: yes
+  become: yes
+  become_user: root
+
+- name: Django app | Dependencies | Memcached | Install Apt libs
+  tags: [django-dependencies, django-initial]
+  when: django_memcached_locations is defined
+  apt: name={{ item }} state=present
+  with_items:
+    - python3-dev
+    - libpq-dev
+    - libsasl2-dev
+    - zlib1g-dev
+    - libmemcached-dev
+  become: true
+  become_user: root
+
+- name: install python3 requirements
+  tags: [requirements]
+  shell: |
+    . /home/{{ user }}/pyenv/versions/env-admission/bin/activate
+    pip install -U pip
+    pip install -r requirements.txt
+  args:
+    chdir: "{{ project_home }}/src/"
+  become: yes
+  become_user: "{{ user }}"
+
 - name: Django app | Source code | Make sure directory exists
   tags: [django-app-code, django-initial]
   file:
@@ -25,68 +57,6 @@
   become: true
   become_user: root
 
-- name: Django app | Dependencies | Pip | Make sure itself is installed
-  tags: [django-dependencies, django-initial]
-  apt: name=python-pip state=present
-  become: true
-  become_user: root
-
-- name: Django app | Dependencies | Pip | Make sure itself is latest
-  tags: [django-dependencies, django-initial]
-  pip: name=pip state=latest
-  become: true
-  become_user: root
-
-- name: Django app | Dependencies | Custom Pip requirements
-  tags: [django-dependencies]
-  pip: requirements={{ django_pip_dependencies }}
-  become: true
-  become_user: root
-  notify:
-    - python code updated
-
-- name: Django app | Dependencies | Debug requirements
-  tags: [django-dependencies, django-initial]
-  when: django_debug|bool
-  pip: name={{ item }} state=present
-  with_items:
-    - django-sslserver
-    - Werkzeug
-    - django-extensions
-  become: true
-  become_user: root
-  notify:
-    - python code updated
-
-- name: Django app | Dependencies | CORS requirements
-  tags: [django-dependencies]
-  when: django_cors is defined
-  pip: name=django-cors-headers state=present
-  become: true
-  become_user: root
-  notify:
-    - python code updated
-
-- name: Django app | Dependencies | Memcached | Install Apt libs
-  tags: [django-dependencies, django-initial]
-  when: django_memcached_locations is defined
-  apt: name={{ item }} state=present
-  with_items:
-    - libsasl2-dev
-    - zlib1g-dev
-    - libmemcached-dev
-  become: true
-  become_user: root
-
-- name: Django app | Dependencies | Memcached | Install Pylibmc
-  tags: [django-dependencies, django-initial]
-  when: django_memcached_locations is defined
-  pip: name=pylibmc state=present
-  become: true
-  become_user: root
-  notify:
-    - python code updated
-
 - name: Django app | Source code | Notify handlers about changed code
   tags: [django-app-code, django-settings]
   when: django_push_mode == "none"
@@ -108,27 +78,51 @@
     path: "{{ django_app_root }}/{{ django_project_module }}/settings.py"
     block: "{{ django_settings_extra }}"
 
-- name: Django app | Deployment checklist
-  django_manage:
-    app_path={{ django_app_root }}
-    command="check --deploy"
-  ignore_errors: yes
-
 - name: Django app | Migrate database
   tags: [django-migrations]
-  django_manage:
-    app_path={{ django_app_root }}
-    command=migrate
+  shell: |
+    . /home/{{ user }}/pyenv/versions/env-admission/bin/activate
+    python manage.py migrate
+  args:
+    chdir: "{{ project_home }}/src/"
+  become: yes
+  become_user: "{{ user }}"
+  ignore_errors: yes
+
+- name: Django app | Deployment checklist
+  shell: |
+    . /home/{{ user }}/pyenv/versions/env-admission/bin/activate
+    python manage.py check --deploy
+  args:
+    chdir: "{{ project_home }}/src/"
+  become: yes
+  become_user: "{{ user }}"
+  ignore_errors: yes
 
 - name: Django app | Collect static assets
   tags: [django-static]
-  django_manage:
-    app_path={{ django_app_root }}
-    command=collectstatic
+  shell: |
+    . /home/{{ user }}/pyenv/versions/env-admission/bin/activate
+    python manage.py collectstatic --no-input
+  args:
+    chdir: "{{ project_home }}/src/"
+  become: yes
+  become_user: "{{ user }}"
+  ignore_errors: yes
 
 - name: Django app | Load initial data
   tags: [django-loaddata]
   when: django_initial_data_fixture.load|bool
-  django_manage:
-    app_path={{ django_app_root }}
-    command="loaddata {{ django_initial_data_fixture.path }}"
+  shell: |
+    . /home/{{ user }}/pyenv/versions/env-admission/bin/activate
+    python manage.py loaddata {{ django_initial_data_fixture.path }}
+  args:
+    chdir: "{{ project_home }}/src/"
+  become: yes
+  become_user: "{{ user }}"
+  ignore_errors: yes
+
+- name: WSGI server | Install Gunicorn
+  apt: name=gunicorn state=present
+  become: true
+  become_user: root

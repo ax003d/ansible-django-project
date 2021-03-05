@@ -27,7 +27,7 @@
 
 - name: Django app | Dependencies | Pip | Make sure itself is installed
   tags: [django-dependencies, django-initial]
-  apt: name=python-pip state=installed
+  apt: name=python-pip state=present
   become: true
   become_user: root
 

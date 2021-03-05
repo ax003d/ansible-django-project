@@ -44,16 +44,12 @@
   synchronize:
     src: "{{ django_local_repo_root }}"
     dest: "{{ django_app_root }}"
-  notify:
-    - python code updated
   become: true
 
 - name: Django app | Source code | Push code| Make pushed code owned by user
   tags: [django-app-code]
   when: django_push_mode == "sync"
   command: "chown -R {{ user }}:{{ group }} {{ django_app_root }}"
-  notify:
-    - python code updated
   become: true
   become_user: root
 
@@ -61,16 +57,12 @@
   tags: [django-app-code, django-settings]
   when: django_push_mode == "none"
   command: /bin/true
-  notify:
-    - python code updated
 
 - name: Django app | Settings | Upload settings template
   tags: [django-settings]
   template:
     src=templates/django_settings.py.j2
     dest={{ django_app_root }}/{{ django_project_module }}/settings.py
-  notify:
-    - python code updated
 
 - name: Django app | Settings | Append extra settings
   tags: [django-settings]
